@@ -46,22 +46,14 @@ pipeline {
     }
 
     post {
-        success {
-            emailext body: "The pipeline ${currentBuild.fullDisplayName} has succeeded.",
-                     subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                     to: 'haroldpsunny@gmail.com',
-                     mimeType: 'text/plain',
-                     attachLog: true,
-                     attachmentsPattern: 'logs/*.log' // Attach all log files in the 'logs' directory
-        }
-    
-        failure {
-            emailext body: "The pipeline ${currentBuild.fullDisplayName} has failed. Please check logs.",
-                     subject: "Pipeline Failure: ${currentBuild.fullDisplayName}",
-                     to: 'haroldpsunny@gmail.com',
-                     mimeType: 'text/plain',
-                     attachLog: true,
-                     attachmentsPattern: 'logs/*.log' // Attach all log files in the 'logs' directory
+        always {
+            emailext (  
+                to: 'haroldpsunny@gmail.com',
+                 subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
+                 body: "The pipeline ${currentBuild.fullDisplayName} has succeeded."
+                 attachlog: true
+            )
         }
     }
-}
+    
+        
