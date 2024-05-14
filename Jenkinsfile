@@ -50,5 +50,18 @@ pipeline {
             emailext body: "The pipeline ${currentBuild.fullDisplayName} has succeeded.",
                      subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
                      to: 'haroldpsunny@gmail.com',
+                     mimeType: 'text/plain',
                      attachLog: true,
-                     mimeTyp
+                     attachmentsPattern: 'logs/*.log' // Attach all log files in the 'logs' directory
+        }
+    
+        failure {
+            emailext body: "The pipeline ${currentBuild.fullDisplayName} has failed. Please check logs.",
+                     subject: "Pipeline Failure: ${currentBuild.fullDisplayName}",
+                     to: 'haroldpsunny@gmail.com',
+                     mimeType: 'text/plain',
+                     attachLog: true,
+                     attachmentsPattern: 'logs/*.log' // Attach all log files in the 'logs' directory
+        }
+    }
+}
