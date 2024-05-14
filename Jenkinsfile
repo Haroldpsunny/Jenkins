@@ -47,11 +47,8 @@ pipeline {
 
     post {
         success {
-            emailext attachLog: true, body: "The pipeline ${currentBuild.fullDisplayName} has succeeded.", subject: "Pipeline Success: ${currentBuild.fullDisplayName}", to: 'haroldpsunny@gmail.com'
-        }
-    
-        failure {
-            emailext attachLog: true, body: "The pipeline ${currentBuild.fullDisplayName} has failed. Please check logs.", subject: "Pipeline Failure: ${currentBuild.fullDisplayName}", to: 'haroldpsunny@gmail.com'
-        }
-    }
-}
+            emailext body: "The pipeline ${currentBuild.fullDisplayName} has succeeded.",
+                     subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
+                     to: 'haroldpsunny@gmail.com',
+                     attachLog: true,
+                     mimeTyp
