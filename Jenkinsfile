@@ -1,46 +1,84 @@
 pipeline {
     agent any
 
+    environment {
+        CODE_DIRECTORY = "/path/to/code"
+        TEST_ENV = "testing"
+        PROD_ENV = "yourname_production"
+        NOTIFICATION_EMAIL = "haroldpsunny@gmail.com"
+    }
+
     stages {
         stage('Build') {
             steps {
-                echo 'Stage 1: Build - Build the code using a build automation tool like Maven.'
+                echo "Fetching the source code from: $CODE_DIRECTORY"
+                echo "Compiling the code and generating artifacts"
+                // Add actual build steps here
             }
         }
-
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Stage 2: Unit and Integration Tests - Run unit tests and integration tests using tools like JUnit and Selenium.'
+                echo "Running unit tests"
+                echo "Running integration tests"
+                // Add actual test steps here
+            }
+            post {
+                success {
+                    mail to: "${env.NOTIFICATION_EMAIL}",
+                         subject: "Unit and Integration Tests Passed",
+                         body: "Unit and Integration Tests have passed successfully. See attached logs for details.<br>Console Output: ${env.BUILD_URL}console",
+                         mimeType: 'text/html'
+                }
+                failure {
+                    mail to: "${env.NOTIFICATION_EMAIL}",
+                         subject: "Unit and Integration Tests Failed",
+                         body: "Unit and Integration Tests have failed. See attached logs for details.<br>Console Output: ${env.BUILD_URL}console",
+                         mimeType: 'text/html'
+                }
             }
         }
-
         stage('Code Analysis') {
             steps {
-                echo 'Stage 3: Code Analysis - Integrate a code analysis tool like SonarQube to analyze code quality.'
+                echo 'Checking the quality of the code'
+                // Add actual code quality check steps here
             }
         }
-
         stage('Security Scan') {
             steps {
-                echo 'Stage 4: Security Scan - Perform security scan using a tool like OWASP ZAP.'
+                echo 'Performing security scan'
+                // Add actual security scan steps here
+            }
+            post {
+                success {
+                    mail to: "${env.NOTIFICATION_EMAIL}",
+                         subject: "Security Scan Passed",
+                         body: "Security scan completed without any issues. See attached logs for details.<br>Console Output: ${env.BUILD_URL}console",
+                         mimeType: 'text/html'
+                }
+                failure {
+                    mail to: "${env.NOTIFICATION_EMAIL}",
+                         subject: "Security Scan Failed",
+                         body: "Security scan has some issues. See attached logs for details.<br>Console Output: ${env.BUILD_URL}console",
+                         mimeType: 'text/html'
+                }
             }
         }
-
         stage('Deploy to Staging') {
             steps {
-                echo 'Stage 5: Deploy to Staging - Deploy the application to a staging server (e.g., AWS EC2 instance) using Jenkins Deploy Plugin.'
+                echo "Deploying the application to the $TEST_ENV environment"
+                // Add actual staging deployment steps here
             }
         }
-
         stage('Integration Tests on Staging') {
             steps {
-                echo 'Stage 6: Integration Tests on Staging - Run integration tests on the staging environment to ensure the application functions correctly.'
+                echo "Running integration tests on staging environment"
+                // Add actual integration tests on staging steps here
             }
         }
-
         stage('Deploy to Production') {
             steps {
-                echo 'Stage 7: Deploy to Production - Deploy the application to a production server (e.g., AWS EC2 instance) using Ansible or Jenkins Deploy Plugin.'
+                echo "Deploying the code to the $PROD_ENV environment"
+                // Add actual production deployment steps here
             }
         }
     }
@@ -48,21 +86,19 @@ pipeline {
     post {
         always {
             emailext (
+                subject: "Pipeline Status: ${currentBuild.result}",
+                body: '''<html>
+                    <body>
+                    <p>Build Status: ${currentBuild.result}</p>
+                    <p>Build Number: ${currentBuild.number}</p>
+                    <p>Console Output: <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a></p>
+                    </body>
+                    </html>''',
                 to: 'haroldpsunny@gmail.com',
-                subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                body: "The pipeline ${currentBuild.fullDisplayName} has succeeded.",
-                attachLog: true
-            )
-        }
-        
-        failure {
-            emailext (
-                to: 'haroldpsunny@gmail.com',
-                subject: "Pipeline Failure: ${currentBuild.fullDisplayName}",
-                body: "The pipeline ${currentBuild.fullDisplayName} has failed. Please check logs."
+                from: 'jenkins@example.com',
+                replyTo: 'jenkins@example.com',
+                mimeType: 'text/html'
             )
         }
     }
 }
-
-
